@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Elm LocalStorage Counters</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div id="main"></div>
+    <script src="elm.js"></script>
+    <script>
+      // isIntArray : a -> Boolean
+      const isIntArray = (value) =>
+        Array.isArray(value) &&
+        value.every(x => typeof x === 'number' && x % 1 === 0)
+
+      // load : String -> Maybe a
+      const load = (name, defaultValue) => {
+        try {
+          return JSON.parse(localStorage.getItem(name))
+        } catch (err) {
+          return null
+        }
+      }
+
+      // save : String -> a -> null
+      const save = (name, value) => {
+        try {
+          localStorage.setItem(name, JSON.stringify(value))
+        } catch (err) {}
+        return null
+      }
+
+      const saveCounts = save.bind(null, 'counts')
+
+      // storedCounts : Maybe a
+      const storedCounts = load('counts')
+      // counts : List Int
+      const counts = isIntArray(storedCounts) ? storedCounts : [0]
+
+      const node = document.querySelector('#main')
+      const app = Elm.Main.embed(node, {counts})
+      app.ports.save.subscribe(saveCounts)
+    </script>
+  </body>
+</html>
